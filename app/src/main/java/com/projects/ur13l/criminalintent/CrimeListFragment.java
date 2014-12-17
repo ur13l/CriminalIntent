@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Created by ur13l on 15/12/14.
@@ -29,6 +30,7 @@ public class CrimeListFragment extends ListFragment{
 
         CrimeAdapter adapter = new CrimeAdapter(mCrimes);
         setListAdapter(adapter);
+
     }
 
     @Override
@@ -40,9 +42,9 @@ public class CrimeListFragment extends ListFragment{
     @Override
     public void onListItemClick(ListView l, View v, int position, long id){
         Crime c = ((CrimeAdapter)getListAdapter()).getItem(position);
-        Intent i = new Intent(getActivity(),CrimeActivity.class);
+        Intent i = new Intent(getActivity(),CrimePagerActivity.class);
         i.putExtra(CrimeFragment.EXTRA_CRIME_ID,c.getId());
-        startActivityForResult(i,REQUEST_CRIME);
+        startActivityForResult(i, REQUEST_CRIME);
     }
 
     @Override
