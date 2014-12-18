@@ -9,5 +9,9 @@
     <string name="crime_solved_label">Solved?</string>
     <string name="crimes_title">Crimes</string>
     <string name="date_picker_title">Date of crime:</string>
+    <string name="radio_date">Change crime\'s date</string>
+    <string name="radio_time">Change crime\'s time</string>
+    <string name="choice_title">Choice an option:</string>
+    <string name="toast_choice">You must select one option.</string>
 
 </resources>

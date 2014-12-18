@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -20,33 +21,63 @@ import java.util.GregorianCalendar;
 public class DatePickerFragment extends DialogFragment{
     public static final String EXTRA_DATE =
             "com.projects.ur13l.criminalintent.date";
+    public static final String EXTRA_CHOICE =
+            "com.projects.ur13l.criminalintent.choice";
 
     private Date mDate;
+    private int mChoice;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         mDate = (Date) getArguments().getSerializable(EXTRA_DATE);
+        mChoice = getArguments().getInt(EXTRA_CHOICE);
 
         //Create a calendar to the the year, month and day.
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(mDate);
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final int year = calendar.get(Calendar.YEAR);
+        final int month = calendar.get(Calendar.MONTH);
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR);
+        int minute = calendar.get(Calendar.MINUTE);
+        View v;
 
         //Create te view to inflate the dialog interface
-        View v = getActivity().getLayoutInflater()
-                .inflate(R.layout.dialog_date, null);
+        if(mChoice == 1) { // Rearm condition
+            v = getActivity().getLayoutInflater()
+                    .inflate(R.layout.dialog_date, null);
 
-        DatePicker datePicker = (DatePicker)v.findViewById(R.id.dialog_date_datePicker);
-        datePicker.init(year,month,day,new DatePicker.OnDateChangedListener() {
-            @Override
-            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                mDate = new GregorianCalendar(year,monthOfYear,dayOfMonth).getTime();
-                getArguments().putSerializable(EXTRA_DATE,mDate);
-            }
-        });
 
+            DatePicker datePicker = (DatePicker) v.findViewById(R.id.dialog_date_datePicker);
+            datePicker.init(year, month, day, new DatePicker.OnDateChangedListener() {
+                @Override
+                public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    mDate = new GregorianCalendar(year, monthOfYear, dayOfMonth).getTime();
+                    getArguments().putSerializable(EXTRA_DATE, mDate);
+                }
+            });
+        }else
+        if(mChoice == 2){
+            v = getActivity().getLayoutInflater()
+                    .inflate(R.layout.dialog_time, null);
+
+            TimePicker timePicker = (TimePicker) v.findViewById(R.id.dialog_time_timePicker);
+            timePicker.setCurrentHour(hour);
+            timePicker.setCurrentMinute(minute);
+            timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+                @Override
+                public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+                    mDate = new GregorianCalendar(year,month,day,hourOfDay,minute).getTime();
+                    getArguments().putSerializable(EXTRA_DATE,mDate);
+                }
+            });
+
+            //COMPLETAR
+
+
+        }else{
+            v=null;
+        }
         //Returning the dialog view with a title, view and buttons.
         return new AlertDialog.Builder(getActivity())
                 .setView(v) //The view is attached between the Title and the Buttons.
@@ -62,10 +93,10 @@ public class DatePickerFragment extends DialogFragment{
                 .create();
     }
 
-    public static DatePickerFragment newInstance(Date date){
+    public static DatePickerFragment newInstance(Date date, int choice){
         Bundle args = new Bundle();
         args.putSerializable(EXTRA_DATE,date);
-
+        args.putSerializable(EXTRA_CHOICE,choice);
         DatePickerFragment fragment = new DatePickerFragment();
         fragment.setArguments(args);
         return fragment;
