@@ -1,14 +1,19 @@
 package com.projects.ur13l.criminalintent;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -37,17 +42,34 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         mCrime=new Crime();
         UUID crimeId = (UUID) getArguments()
                 .getSerializable(EXTRA_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if(NavUtils.getParentActivityName(getActivity()) != null){
+                    NavUtils.navigateUpFromSameTask(getActivity());
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_crime,parent,false);
+
+        ActionBarActivity a=(ActionBarActivity)getActivity();
+        if(NavUtils.getParentActivityName(getActivity()) != null) {
+            a.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         mTitleField=(EditText)v.findViewById(R.id.crime_title);
         mTitleField.setText(mCrime.getTitle());
         mTitleField.addTextChangedListener(new TextWatcher() {
@@ -118,8 +140,13 @@ public class CrimeFragment extends Fragment {
        getActivity().setResult(Activity.RESULT_OK,null);
     }
 
+    @Override
+    public void onPause(){
+        super.onPause();
+        CrimeLab.get(getActivity()).saveCrimes();
+    }
     public void updateDate(){
         mDf = new DateFormat();
-        mDateButton.setText(mDf.format("E, MMM d, yyyy",mCrime.getDate()).toString());
+        mDateButton.setText(mDf.format("E, MMM d, yyyy. hh:mm aa",mCrime.getDate()).toString());
     }
 }

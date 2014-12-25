@@ -13,5 +13,10 @@
     <string name="radio_time">Change crime\'s time</string>
     <string name="choice_title">Choice an option:</string>
     <string name="toast_choice">You must select one option.</string>
-
+    <string name="new_crime">New Crime</string>
+    <string name="show_subtitle">Show subtitle</string>
+    <string name="hide_subtitle">Hide subtitle</string>
+    <string name="subtitle">If you see something, say something.</string>
+    <string name="delete_crime">Delete</string>
+    <string name="empty">There are no crimes to show.</string>
 </resources>

@@ -26,6 +26,7 @@ public class DatePickerFragment extends DialogFragment{
 
     private Date mDate;
     private int mChoice;
+    TimePicker timePicker;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
@@ -61,14 +62,15 @@ public class DatePickerFragment extends DialogFragment{
             v = getActivity().getLayoutInflater()
                     .inflate(R.layout.dialog_time, null);
 
-            TimePicker timePicker = (TimePicker) v.findViewById(R.id.dialog_time_timePicker);
-            timePicker.setCurrentHour(hour);
+            timePicker = (TimePicker) v.findViewById(R.id.dialog_time_timePicker);
             timePicker.setCurrentMinute(minute);
+            timePicker.setCurrentHour(hour);
             timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
                 @Override
                 public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                     mDate = new GregorianCalendar(year,month,day,hourOfDay,minute).getTime();
                     getArguments().putSerializable(EXTRA_DATE,mDate);
+
                 }
             });
 
@@ -91,6 +93,14 @@ public class DatePickerFragment extends DialogFragment{
                             }
                         })
                 .create();
+    }
+
+    public void onResume(){
+        super.onResume();
+        if(mChoice == 2) {
+            int hour = timePicker.getCurrentHour();
+            timePicker.setCurrentHour(hour);
+        }
     }
 
     public static DatePickerFragment newInstance(Date date, int choice){
