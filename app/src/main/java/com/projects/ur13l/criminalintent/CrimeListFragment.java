@@ -46,7 +46,7 @@ public class CrimeListFragment extends ListFragment{
         mSubtitleVisible = true;
     }
 
-    @TargetApi(11)
+   @TargetApi(11)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
         View v;
