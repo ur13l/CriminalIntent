@@ -50,6 +50,8 @@ public class PictureUtils {
         BitmapDrawable b = (BitmapDrawable) imageView.getDrawable();
         b.getBitmap().recycle();
         imageView.setImageDrawable(null);
+        imageView.invalidateDrawable(imageView.getDrawable());
+
     }
 
 }

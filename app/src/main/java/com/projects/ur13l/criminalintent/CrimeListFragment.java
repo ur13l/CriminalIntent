@@ -64,6 +64,7 @@ public class CrimeListFragment extends ListFragment{
 
 
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB){
+            //Floating ContextMenu instead of ActionBar ContextMenu
             registerForContextMenu(listView);
         }else {
             listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
