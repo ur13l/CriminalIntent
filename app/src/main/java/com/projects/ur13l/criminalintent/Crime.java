@@ -85,7 +85,7 @@ public class Crime {
     public JSONObject toJSON() throws JSONException{
         JSONObject json = new JSONObject();
         json.put(JSON_ID, mId.toString());
-        json.put(JSON_TITLE, mTitle.toString());
+        json.put(JSON_TITLE, mTitle);
         json.put(JSON_SOLVED, mSolved);
         json.put(JSON_DATE, mDate.getTime());
         if(mPhoto != null) {

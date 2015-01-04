@@ -1,9 +1,13 @@
 package com.projects.ur13l.criminalintent;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.ActionMode;
@@ -29,9 +33,26 @@ import java.util.ArrayList;
  */
 public class CrimeListFragment extends ListFragment{
     public ArrayList<Crime> mCrimes;
+    private Callbacks mCallbacks;
     private boolean mSubtitleVisible;
     private static final String TAG = "CrimeListFragment";
     private static final int REQUEST_CRIME = 1;
+
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Activity activity){
+        super.onAttach(activity);
+        mCallbacks = (Callbacks)activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -99,6 +120,16 @@ public class CrimeListFragment extends ListFragment{
                             }
                             mode.finish();
                             adapter.notifyDataSetChanged();
+                            if(getActivity().findViewById(R.id.detailFragmentContainer) != null) {
+                                FragmentManager fm = getActivity().getSupportFragmentManager();
+                                FragmentTransaction ft = fm.beginTransaction();
+
+                                Fragment detailRemove = fm.findFragmentById(R.id.detailFragmentContainer);
+                                if(detailRemove != null){
+                                    ft.remove(detailRemove);
+                                }
+                                ft.commit();
+                            }
                             return true;
                         default:
                             return false;
@@ -189,9 +220,10 @@ public class CrimeListFragment extends ListFragment{
     @Override
     public void onListItemClick(ListView l, View v, int position, long id){
         Crime c = ((CrimeAdapter)getListAdapter()).getItem(position);
-        Intent i = new Intent(getActivity(),CrimePagerActivity.class);
-        i.putExtra(CrimeFragment.EXTRA_CRIME_ID,c.getId());
-        startActivityForResult(i, REQUEST_CRIME);
+        mCallbacks.onCrimeSelected(c);
+        if(getActivity().findViewById(R.id.detailFragmentContainer) != null) {
+            getActivity().setTitle(c.getTitle());
+        }
     }
 
     @Override
@@ -204,9 +236,12 @@ public class CrimeListFragment extends ListFragment{
     public void newCrime(){
         Crime crime = new Crime();
         CrimeLab.get(getActivity()).addCrime(crime);
-        Intent i = new Intent(getActivity(),CrimePagerActivity.class);
-        i.putExtra(CrimeFragment.EXTRA_CRIME_ID,crime.getId());
-        startActivityForResult(i,0);
+        ((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
+        mCallbacks.onCrimeSelected(crime);
+    }
+
+    public void updateUI() {
+        ((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
     }
 
     private class CrimeAdapter extends ArrayAdapter<Crime>{

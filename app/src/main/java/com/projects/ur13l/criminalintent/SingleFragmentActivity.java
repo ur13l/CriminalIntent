@@ -16,10 +16,13 @@ public abstract class SingleFragmentActivity extends ActionBarActivity {
 
     protected abstract Fragment createFragment();
 
+    protected int getLayoutResId(){
+        return R.layout.activity_fragment;
+    }
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment);
+        setContentView(getLayoutResId());
 
         if(getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);

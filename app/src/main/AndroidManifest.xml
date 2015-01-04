@@ -31,6 +31,7 @@
         <activity android:name=".CrimeCameraActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="true"
+            android:screenOrientation="landscape"
             android:label="@string/app_name"/>
 
     </application>

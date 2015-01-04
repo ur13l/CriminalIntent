@@ -13,6 +13,7 @@ import android.provider.ContactsContract;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -61,6 +62,23 @@ public class CrimeFragment extends Fragment {
     private ImageView mPhotoView;
     private Button mSuspectButton;
     private Button mCallSuspectButton;
+    private Callbacks mCallbacks;
+
+    public interface Callbacks {
+        void onCrimeUpdated (Crime crime);
+    }
+
+    @Override
+    public void onAttach (Activity activity){
+        super.onAttach(activity);
+        mCallbacks = (Callbacks)activity;
+    }
+
+    @Override
+    public void onDetach(){
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -91,9 +109,23 @@ public class CrimeFragment extends Fragment {
             case R.id.menu_item_delete_crime:
                 CrimeLab.get(getActivity()).deleteCrime(mCrime);
 
-                if(NavUtils.getParentActivityName(getActivity()) != null){
-                    NavUtils.navigateUpFromSameTask(getActivity());
+                if(getActivity().findViewById(R.id.detailFragmentContainer) == null) {
+                    if (NavUtils.getParentActivityName(getActivity()) != null) {
+                        NavUtils.navigateUpFromSameTask(getActivity());
+                    }
+                } else {
+                    FragmentManager fm = getActivity().getSupportFragmentManager();
+                    FragmentTransaction ft = fm.beginTransaction();
+
+                    Fragment detailRemove = fm.findFragmentById(R.id.detailFragmentContainer);
+                    if(detailRemove != null){
+                        ft.remove(detailRemove);
+                    }
+                    ft.commit();
                 }
+
+
+                mCallbacks.onCrimeUpdated(mCrime);
                 Toast.makeText(getActivity(),"The crime: '"+mCrime.getTitle()+
                         "' has been deleted correctly",Toast.LENGTH_SHORT).show();
                 return true;
@@ -122,6 +154,8 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mCrime.setTitle(s.toString());
+                mCallbacks.onCrimeUpdated(mCrime);
+                getActivity().setTitle(mCrime.getTitle());
             }
 
             @Override
@@ -150,6 +184,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mCrime.setSolved(isChecked);
+                mCallbacks.onCrimeUpdated(mCrime);
             }
         });
 
@@ -270,6 +305,7 @@ public class CrimeFragment extends Fragment {
             Date date = (Date)data
                     .getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mCrime.setDate(date);
+            mCallbacks.onCrimeUpdated(mCrime);
             updateDate();
         } else if (requestCode == REQUEST_PHOTO){
             //Create a new Photo object and attach it to the crime
@@ -281,6 +317,7 @@ public class CrimeFragment extends Fragment {
                 }
                 Photo p = new Photo(filename);
                 mCrime.setmPhoto(p);
+                mCallbacks.onCrimeUpdated(mCrime);
                 showPhoto();
             }
         } else if (requestCode == REQUEST_CONTACT){
@@ -308,6 +345,7 @@ public class CrimeFragment extends Fragment {
                     mCrime.setSuspect(cName);
                     mCrime.setSuspectPhone(cNumber);
                     mSuspectButton.setText(cName);
+                    mCallbacks.onCrimeUpdated(mCrime);
                     c.close();
                     phone.close();
 
